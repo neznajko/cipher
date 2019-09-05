@@ -5,6 +5,19 @@
 .global main    			/*                            */
 /*******1^^^^^^^2*******3*******4-------/#******6**\****7*******8******/
 .data					/*                            */
+optstring:				/*`                           */
+	.string "dh"			/*			      */
+fmt:					/*                            */
+	.string	"Usage: %s [option].. \'msg\'\n" /*                   */
+help:					/*                            */
+	.ascii	"  -d, decode\n"	/*			      */
+	.asciz 	"  -h, help (not very useful)\n" /*		      */
+prognom:				/*			      */
+	.long	0			/* ptr returned by basename   */
+deflag:					/* decode flag                */
+	.long	0			/*                            */
+msg:					/* msg addr                   */
+	.long	0			/*			      */
 /*``````1_______2-------3=======4~~~~~~~5.......6,,,,,,,7%%%%%%%8*******
 0:	|0|0|0|0|0|0|    	1:	|0|0|0|0|0|1|    
 3:	|0|0|0|0|1|1|    	2:	|0|0|0|0|1|0|    
@@ -107,12 +120,18 @@ TOPSECRETMSG01:
 	.ascii "-DAS/IST:PROTIVEN,GLASETZ!.."
 	.asciz "+AINE,.BULGARISHE,POURVENETZ."
 TOPSECRETMSG02:
-	.asciz	"..!YEAH/,"
+	.asciz	"..!YEAH/,!"
+TOPSECRETMSG03:
+	.asciz	"0C1728352E0C301D3A"
 zecode:
 	.ascii	"!!++--//::??AABBCCDDEEFFGGHHIIJJ"
 	.asciz 	"KKLLMMNNOOPPQQRRSSTTUUVVWWXXYYZZ"
 hex:
 	.string	"0123456789ABCDEF"
+hextab:
+	.byte	0,  1,  2,  3,  4,  5,  6,  7
+	.byte	8,  9,  0,  0,  0,  0,  0,  0
+	.byte	0, 10, 11, 12, 13, 14, 15,  0
 ////////////////////////////////////////////////////////////////////////
 /*......0.......1.......2.......3....... .......5.......6.......7.....*/
 /*^^^^^^_^^^^^^^_^^^^^^^__^^^^^^__^^|^^^4^^^^^^^_^^^^^^^_^^^^^^_^^^^^^*/
@@ -168,6 +187,24 @@ setupbyte: /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
 	mov	oddtab(%edx), %dl /* get character odd encoding */
 	or	%dl, %al /* add it to the right fld of al */
 0:	ret     /* bye */
+/*-------________````````========________^^^^^^^^........,,,,,,,,******
+ * infut: r32 - 32-bit register holding source memory address         *
+ * oufut: r8  - 8-bit destination register                            *
+ * loads a byte at r32 to r8                                          *
+ ********~~~~~~~~^^^^^^^^________<<<<<<<<--------````````________******/
+.macro	load	r32, r8
+	inc	\r32 /* click next */
+	mov	(\r32), \r8 /* load byte */
+.endm
+/********@@@@@@@@((((((((````````LLLLLLLL????????////////>>>>>>>>******
+ * infut: r8  - 8-bit source register                                 *
+ * oufut: r32 - 32-bit register holding destination memory address    *
+ * stores a byte from r8 to r32                                       *
+ ********________<<<<<<<<````````))))))))########!!!!!!!!00000000******/
+.macro	store	r8, r32
+	inc	\r32 /* clcknext */
+	mov	\r8, (\r32) /* store byte */
+.endm
 /*	0	1	2	3	4	5	6	7     */
 /*******________////////--------~~~~~~~~11111111<<<<<<<<........*******
  * infut: esi - ascii msg addr                                        *
@@ -176,14 +213,12 @@ setupbyte: /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _*/
 encode:	strlen	esi /* oufut to eax */
 	inc	%eax /* add space for end of msg byte */
 	calloc	eax, $1 /* allocate some space */
-	mov	%eax, %edi /* pass addr to edi */
-	push	%edi /* save edi to stack (we use it as an iterator) */
-	xor	%eax, %eax /* clean */
-	mov	$1, %dl /* initialize dl with a non zero value */
+	push	%eax /* save ptr to stack */
 	lea	-1(%esi), %esi /* ready steady .. **/
-	lea	-1(%edi), %edi /** .. go **/
-1:	inc	%esi /* yeah! */
-	mov	(%esi), %al /* load chr to al */
+	lea	-1(%eax), %edi /** .. go **/
+	xor	%eax, %eax /* clean */	
+	mov	$1, %dl /* initialize dl with a non zero value */	
+1:	load	esi, al /* load character ascii code to al */
 	cmp	$0, %al /* ar ve don? */
 	jz	0f /* aye aye */
 	cmp	lchr, %al /* left field first character? */
@@ -193,20 +228,18 @@ encode:	strlen	esi /* oufut to eax */
 2:	cmp	lchr+1, %al /* left field second character? */
 	jnz	4f /* eNOuPe */
 	mov	$2, %al /* set character encoding */
-3:	inc	%esi /* boom */
-	mov	(%esi), %dl /* get next character */
+3:	load	esi, dl /* boom (get next character) */
 	call	setupbyte /* wow! what is this? */
 	jmp	5f /* store encoding */
 4:	sub	$' , %al /* get table index */
 	mov	eventab(%eax), %al /* get encoding */
-5:	inc	%edi /* come on! */
-	mov	%al, (%edi) /* i-j-ye-s-z-t!! */
+5:	store	al, edi /* i-j-ye-s-z-t!! (come on!) */
 	cmp	$0, %dl /* ar ve don? */	
 	jnz	1b /* mais non, continuer à répéter */
-0:	inc	%edi /* one last time*/
-	movb	$0xff, (%edi) /* end of message byte */
+0:	mov	$0xff, %al /* end of message byte */
+	store	al, edi /* one last time*/
 	pop	%edi /* yeah! */
-	ret
+	ret	/* bye encode */
 /********________````````00000000--------$$$$$$$$\\\\\\\\^^^^^^^^******
  * get encoded message length                                         *
  * infut: edi - encoded msg addr                                      *
@@ -240,7 +273,7 @@ msglen:	nop /* Okay */
  * infut: edi - encoded msg addr                                      *
  * oufut: esi - decoded msg addr                                      *
  *	0	1	2	3	4	5	6	7     */
-decode: nop /* yeah! */
+decode: nop	/* yeah! */
 	call	msglen /* get message length (ecx) */
 	shl	$1, %ecx /* multiply by 2 */
 	inc	%ecx /* add space for a zero byte */
@@ -249,8 +282,7 @@ decode: nop /* yeah! */
 	lea	-1(%edi), %edi /* initialize iterators */
 	lea	-1(%eax), %esi
 	xor	%eax, %eax /* clear */
-1:	inc	%edi /* click next */
-	mov	(%edi), %al /* load byte to al */
+1:	load	edi, al /* load byte to al */
 	cmp	$0xff, %al /* are we done? */
 	jz	0f /* yep! */
 	getfld	$6, $2 /* get left field (edx) */
@@ -263,8 +295,7 @@ decode: nop /* yeah! */
 	cmp	$2, %dl /* ck if second lchr */
 	jnz	4f /* nop */
 3:	mov	lchr-1(%edx), %edx /* decode */
-	inc	%esi /* what? */
-	mov	%dl, (%esi) /* y-y-yeah! */
+	store	dl, esi /* what? (y-y-yeah!) */
 	getfld	$0, $6 /* get right field encoding */
 	mov	zecode(%edx), %edx /* yeah! */
 	jmp	6f /* follow me */
@@ -273,18 +304,16 @@ decode: nop /* yeah! */
 	jnz	5f /* nop */
 	getfld	$0, $2 /* get ze first one */
 	mov	lchr-1(%edx), %edx /* decode */
-	inc	%esi /* I had to make a macro */	
-	mov	%dl, (%esi) /* jest! */
+	store	dl, esi /* jest! */
 	getfld	$2, $2 /* get ze second one */
 	mov	lchr-1(%edx), %edx /* decode */
 	jmp	6f /* follow me! */
 5:	getfld	$0, $2 /* get ze encoding */
 	mov	lchr-1(%edx), %edx /* decode */
-6:	inc	%esi /* click next */
-	mov	%dl, (%esi) /* i-j-y-e-s-z-t-! */
+6:	store	dl, esi /* i-j-y-e-s-z-t-! */
 	jmp	1b /* loof */
 0:	pop	%esi /* re-establish */
-	ret /* bye decode:) */
+	ret 	/* bye decode:) */
 /*
  * infut: edi - encoded msg addr                                      *
  * oufut: esi - hex str addr                                          *
@@ -299,21 +328,49 @@ code2hexstr:
 	lea	-1(%edi), %edi /* initialize iterators */
 	lea	-1(%eax), %esi
 	xor	%eax, %eax /* clear */
-1:	inc	%edi /* click next */
-	mov	(%edi), %al /* load byte to al */
+1:	load	edi, al /* load byte to al */
 	cmp	$0xff, %al /* are we done? */
 	jz	0f /* yep! */
 	getfld	$4, $4 /* get first hex number */
 	mov	hex(%edx), %dl /* get the ascii representation */
-	inc	%esi /* click next */
-	mov	%dl, (%esi) /* store */
+	store	dl, esi
 	getfld	$0, $4 /* get second hex number */
 	mov	hex(%edx), %dl /* get the ascii representation */
-	inc	%esi /* click next */
-	mov	%dl, (%esi) /* store */
+	store	dl, esi
 	jmp	1b /* loof */
 0:	pop	%esi /* re-establish */
 	ret 	/* bye code2hexstr:) */
+/*_______........,,,,,,,,````````--------********^^^^^^^^<<<<<<<<******
+ * hex string to code                                                 *
+ * infut: esi - hex str ptr                                           *
+ * oufut: edi - code str addr                                         *
+ * Converts hex string to numeric values and adds end of message byte *
+ *	1	2	3	4	5	6	7	8     */
+hexstr2code:	
+	strlen	esi /* get string length to eax */
+	shr	$1, %eax /* divide by 2 (e.g. AF is one byte) */
+	inc	%eax /* end of message byte */
+	calloc	eax, $1 /* allocate some space */
+	push	%eax /* backup */
+	lea	-1(%esi), %esi /* initialize iterators */
+	lea	-1(%eax), %edi
+	xor	%eax, %eax /* clear */
+1:	load	esi, al /* get ascii to al */
+	cmp	$0, %al /* are we done? */
+	jz	0f /* aye-aye */
+	sub	$'0, %al /* get hextab index */
+	mov	hextab(%eax), %dl /* get the numeric value to dl */
+	shl	$4, %dl /* shift on the queen side */
+	load	esi, al /* get ascii to al */
+	sub	$'0, %al /* get hextab index */
+	mov	hextab(%eax), %al /* get the numeric value to al */
+	or	%al, %dl /* now %dl has the value */
+	store	dl, edi /* yeah! (store) */
+	jmp	1b /* follow me */
+0:	mov	$0xff, %al  /* add end of message byte */
+	store	al, edi /* yeah! */
+	pop	%edi /* re-establish */
+	ret	/* come on */
 ////////////////////////////////////////////////////////////////////////
 clean:	nop			/* */
 	xor	%eax, %eax      /*      _                        */
@@ -323,9 +380,42 @@ clean:	nop			/* */
 	sub	%esi, %esi      /*   				 */
 	xor	%edi, %edi      /* 				 */
 	ret		        /*                               */
+//////////////////////////////////////////////////////rpqt//////////////
+.macro usage status
+	printf	$fmt, prognom
+	printf	$help
+	ccall	exit, \status
+.endm /*            ****++++xxxx====----,,,,____ roqt                 */
+// infut: ebx - argc
+//	  edi - argv	
+geropt:
+	ccall	basename, (edi)	/* output at eax (char *)             */
+	mov	%eax, prognom	/* save ptr at prognom	              */
+1:	ccall	getopt, ebx, edi, $optstring /* eax <- option char    */
+	cmp	$-1, %eax	/* < are we done >                    */
+	jz	1f		/* yep                                */
+d:	cmp	$'d, %eax	/* < decode flag >                    */
+	jnz	h		/* N                                  */
+	movl	$1, deflag      /* raise flag                         */
+	jmp	1b		/* get next option                    */
+h:	cmp	$'h, %eax	/* < help >                           */
+	jnz	daft		/* N                                  */
+	usage	$0		/* exit status 0                      */
+daft:	usage	$1		/* exit status 1 		      */
+1:	nop			/*				      */
+	mov	optind, %ecx	/* msg argv index                     */
+	cmp	%ecx, %ebx	/* ck if any msg is given             */
+	jnz	2f		/* yep                                */
+	usage	$1              /* nop			              */
+2:	mov	(%edi, %ecx, 4), %eax /* thatz 			      */
+	mov	%eax, msg       /* copy Ninja Kakashi		      */
+	ret			/* 		 		      */
 /* OK ON Y VA!..                                                      */
 /*******1*******2*******3*******4* *****5*******6*******7*******8******/
 main:	nop		        /* 		                      */
+	mov	4(%esp), %ebx	/* argc                               */
+	mov	8(%esp), %edi	/* argv                               */
+	call	geropt		/* get options			      */
 	call	clean		/* empty trash			      */
 	enter 	$0, $0	        /* He e >ecHo ga cu 6ypkoa	      */
 	nop		        /* cnpeTe cu 3ByKa Ha Te<eBu3opa!     */
@@ -333,10 +423,15 @@ main:	nop		        /* 		                      */
 	call	setuptabs	/* setup tables */
 	// ¿!! Test Zone !!!
 	nop
-	mov	$TOPSECRETMSG02, %esi
+	mov	msg, %esi
+	cmp	$1, deflag
+	jz	1f
 	call	encode
 	call	code2hexstr
-	puts	esi
+	jmp	2f
+1:	call	hexstr2code
+	call	decode
+2:	puts	esi
 bye:	nop			/*                    o               */
 	leave		        /*	            < x >             */
 	xor	%eax, %eax	/* exit status	      v		      */
@@ -346,5 +441,4 @@ bye:	nop			/*                    o               */
 /*	L	h	>	*	G	a	=	/     */
 /*******1*******2*******3*******4*******5*******6*******7*******8******/
 /* 7e ce BuguM Ha peBaHma                                           log:
- * - make clean macro
  *	v	v	v	V	v	v	V	_     */
