@@ -46,11 +46,11 @@ the winning blow.. ***Okay*** I hope you found *Bishop* captures *b7*
 ***Okay*** ve divide a byte into *left* and *right* fields, consisting of
 *2* and *6* bits respectively. In the *right field* ve can haaf
 *64* numbers: *32* vith odd and *32* vith even parity, in the *left field*
-ve haav the same scenario but with only *2 plus 2 numbers. Did you
+ve haav the same scenario but with only *2 plus 2* numbers. Did you
 notice already that *32 + 2 = 34* equals the number of symbols ve hafe to
-code:). ***Z.o0O*** we can pick *2* characters let's say **.,** and code
+code:). ***Z.o0O*** we can pick *2* characters let's say *.,* and code
 them as *1* and *2* respectively, this will be *left field characterz*,
-zo if ve haaf a sequence ```.A``` or ```,Z``` ve can pack *2* characters
+zo if ve haaf a sequence *.A* or *,Z* ve can pack *2* characters
 into one byte by using the *odd* encoding for the
 *right field characterz*. For single *rchrs* in the *lfld* ve put
 **dzero** and the *even* encoding in ze *rfld*. This looks nice and clean,
