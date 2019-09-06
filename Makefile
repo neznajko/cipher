@@ -10,9 +10,6 @@ $(TARGET): $(TARGET).o
 $(TARGET).o: $(TARGET).S glibc.s
 	$(CC) $(CFLAGS) $< -c -o $@
 
-.PHONY: clean debug
+.PHONY: clean
 clean:
 	$(RM) $(TARGET) $(TARGET).o
-
-debug: CFLAGS += -DDEBUG
-debug: $(TARGET)
