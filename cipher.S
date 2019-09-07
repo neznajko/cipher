@@ -96,7 +96,7 @@ ASCII
  *======================================|* *|=========`===============*/
 /*******1*******2*******3*******4*******5* *****6*******7*******8******/
 	.lcomm	eventab, TABSIZ /* even parity encoding table */
-	.lcomm   oddtab, TABSIZ /*  odd parity encoding table */
+	.lcomm  oddtab,  TABSIZ /* odd  parity encoding table */
 tab:
 	.long	eventab, oddtab /* yeah! */
 evencode:
@@ -115,12 +115,6 @@ rchr: /* right field characters */
 	.string	"!+-/:?ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 lchr: /* left field characterz */
 	.string	".,"
-TOPSECRETMSG01:
-	.ascii "-..WAS,IST/DAS??"
-	.ascii "-DAS/IST:PROTIVEN,GLASETZ!.."
-	.asciz "+AINE,.BULGARISHE,POURVENETZ."
-TOPSECRETMSG02:
-	.asciz	"..!YEAH/,!"
 TOPSECRETMSG03:
 	.asciz	"0C1728352E0C301D3A"
 zecode:
