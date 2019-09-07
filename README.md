@@ -1,12 +1,12 @@
 ## *004*
 **T**he [*mission*](https://ioinformatics.org/files/ioi1989problem4.pdf)
-is *top secret* ***(as usual)*** and is about figuring a message encoding.
+is *top secret* ***(as usual)*** and is "bout figuring a message encoding.
 We have *34* symbols: the alphabet capital letters **```A-Z```** and
 *8* punctuation marks: **```. , + - : / ? !```**, and we have ***first***
 to find such encoding that each byte of information contains even number
 of bits, and *second* the message has to have minimum size.
 
-Obviously we are not interested in an *8-bit* encoding, *7* is too
+Obviously nobody is interested in an *8-bit* encoding, *7* is too
 odd number even to consider, and we need at least *6* bits to
 represent *34* different characters *(2<sup>5</sup> = 32)*, so the
 question is: Can we find some fancy *6-bit* encoding which spans
@@ -30,29 +30,29 @@ repeating character only:
 ?---%---,--->---q---`---+---\---.---!---@--->---+
 ```
 In every byte the first and the last *2-bit* fields are the same, so
-center bits must have even number of ones, which is true for all *3*
-combinations, zo all *3* fields must have either even *(0, 2)* or odd
-*(1, 3)* values, but there are only *16* such cases. So we can't encode
-characters in a *general* fashion. We  musta use some sort of convention..
+center bits must have even parity, which is true for all *3* combinations,
+zo all *3* fields must have either even *(0, 3)* or odd *(1, 2)* parity,
+but there are only *16* such cases. So we can't encode characters in a
+*general* fashion. We  musta use some sort of convention..
 
 ### ```C):' <- man with a hat smoking cigarette```
 ***Okay*** if someone plays against you *1. a2-a4*, I recommend
-*1... a7-a6*, which is know as *cipher attack*. The best defense here
+*1... a7-a6*, which is known as *cipher attack*. The best defense here
 is *2. a4-a5*, vhich is known as *advanced cipher*. ***Okay*** I'm
 going to reveal the solution, so you can stop the video and try to find
-the winning blow.. ***Okay*** I hope you've found *Bishop* captures *b7*
+the winning blow.. ***Okay*** I hope you've found *Bishop* takes *b7*
 **boom** *ha-ha-ha*:)
 
-We divide a byte into ***left*** and ***right*** fields, each containing
-*2* and *6* bits respectively. Than with a given *field* parity,
+*Wet*|*s* divide a byte into ***left*** and ***right*** fields, each
+containing *2* and *6* bits respectively. Than with a given *field* parity,
 we can represent *2* numbers in the *left* field, and *32* in the *right*
 field, totally *34* numbers!
 ***Zo0O*** we can pick *2* *left field* characters
 *(lchr)*, let's say *```.,```* and code them as *1* and *2* respectively
-(*odd parity*), zo if we haaf a sequence *lchr*/**rchr**, e.g. *```.A```*
-or *```,Z```* we can pack *2* characters into one byte by using *odd*
-encoding for the *right field* characterz *(rchr)*, and if we have a single
-*rchr*, than in the *left field* we put **dzero** and *even* encoding in the
+(*odd encoding*), zo if we haaf a sequence *lchr*/**rchr**, e.g. *```.A```*
+or *```,Z```* than we can pack *2* characters into one byte by using *odd
+encoding* for the *right field* characterz *(rchr)* as well, and if there is a
+single *rchr*, in the *left field* ve put **dzero** and *even encoding* in the
 *right field*. Now the messy part:
 ```
 - two consecutive lchrs (e.g. ,.)
