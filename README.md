@@ -2,7 +2,7 @@
 **T**he [*mission*](https://ioinformatics.org/files/ioi1989problem4.pdf)
 is *top secret* ***(as usual)*** and is about figuring a message encoding.
 We have *34* symbols: the alphabet capital letters **```A-Z```** and
-*8* punctuation marks: **```. , + - : / ? !```**, and ve have ***first***
+*8* punctuation marks: **```. , + - : / ? !```**, and we have ***first***
 to find such encoding that each byte of information contains even number
 of bits, and *second* the message has to have minimum size.
 
@@ -20,7 +20,7 @@ Let's mark each *2-bit* field within a *6-bit* segment as follows:):
 | a | Z | ? |
 +---*---^---?
 ```
-Than bek**oo**z in *3* bytes ve hafe four *6-bit* segments, ve can easily
+Than because in *3* bytes we have four *6-bit* segments, we can easily
 check if there are enough possibilities to write messages with one
 repeating character only:
 ```
@@ -43,15 +43,17 @@ going to reveal the solution, so you can stop the video and try to find
 the winning blow.. ***Okay*** I hope you've found *Bishop* captures *b7*
 **boom** *ha-ha-ha*:)
 
-***Okay*** ve divide a byte into *left* and *right* fields, containing
-*2* and *6* bits respectively. Than with a given parity, we can represent
-*2 + 32 = 34* numbers! ***Zo0O*** we can pick *2* *left field* characters
-*(lchr)*, let's say *```.,```* and code them as *1* and *2* respectively,
-zo if we haaf a sequence *```.A```* or *```,Z```* ve can pack *2*
-characters into one byte by using *odd* encoding for the *right field*
-characterz *(rchr)*. If we have a single *rchr*, than in the *left field*
-ve put **dzero** and *even* encoding in ze *right field*. Now the messy
-part:
+We divide a byte into ***left*** and ***right*** fields, each containing
+*2* and *6* bits respectively. Than with a given *field* parity,
+we can represent *2* numbers in the *left* field, and *32* in the *right*
+field, totally *34* numbers!
+***Zo0O*** we can pick *2* *left field* characters
+*(lchr)*, let's say *```.,```* and code them as *1* and *2* respectively
+(*odd parity*), zo if we haaf a sequence *lchr*/**rchr**, e.g. *```.A```*
+or *```,Z```* we can pack *2* characters into one byte by using *odd*
+encoding for the *right field* characterz *(rchr)*, and if we have a single
+*rchr*, than in the *left field* we put **dzero** and *even* encoding in the
+*right field*. Now the messy part:
 ```
 - two consecutive lchrs (e.g. ,.)
 8   6   4   2   0 
@@ -72,9 +74,10 @@ repeating *lchrs* but it **```l..ks```** too much, so I didn't even
 consider such case, also *0xff* is used az an end of message byte.
 
 ### cipher.S
-*Yeah! Yea! Ye! Y! !* **'kay** the program is relatively simple, so I've
-decided it's the right time to show my assembly skillz:). It's a
-*32-bit* ***gas*** using *glibs* and it will encode by default:
+*Yeah! Yea! Ye! Y! !* **Okay** the program is fairly simple, so I've
+decided this is the right time to show my assembly skillz:). It's a
+*32-bit* ***gas*** using *glibs* and it will encode the message 
+given at the command line by default:
 ```
 $ ./cipher '.,ELATE/VOUF,OTBORA//NA,DEVIZ!!'
 C914220C33140636283517A9330F282E0C0606270C9314361D3F0000
@@ -84,4 +87,5 @@ To decode use the *-d* option:
 $ ./cipher -d '0C212806303314AA2E143C0C221DB128353006282E1D3FC5'
 AKO/STE,PREYALI,SOUS/ORIZ..
 ```
-https://youtu.be/qFLhGq0060w
+https://youtu.be/-ojHWQrm4UM
+
