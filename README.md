@@ -86,5 +86,3 @@ $ ./cipher -d '0C212806303314AA2E143C0C221DB128353006282E1D3FC5'
 AKO/STE,PREYALI,SOUS/ORIZ..
 ```
 https://youtu.be/cjVQ36NhbMk
-
-![fonts](pix/fonts.png)
