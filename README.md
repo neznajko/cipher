@@ -1,3 +1,4 @@
+![font](pix/font.png)
 ## *004*	
 **T**he [*mission*](https://ioinformatics.org/files/ioi1989problem4.pdf)
 is *top secret* ***(as usual)*** and is "bout figuring a message encoding.
@@ -85,4 +86,4 @@ To decode use the *-d* option:
 $ ./cipher -d '0C212806303314AA2E143C0C221DB128353006282E1D3FC5'
 AKO/STE,PREYALI,SOUS/ORIZ..
 ```
-https://youtu.be/cjVQ36NhbMk
+https://youtu.be/9EZQfr9RMzk
