@@ -115,6 +115,16 @@ rchr: /* right field characters */
 	.string	"!+-/:?ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 lchr: /* left field characterz */
 	.string	".,"
+TOPSECRETCON01:
+	.ascii	"-..GOVORIME/ZA/BLOK/BOUSTER!"
+	.ascii	"-.,NE/MOGA/DA/TI/OBESHTAYA,NISHTO,"
+	.ascii	"POZNAVAM/EDIN/REZHISYOR,OT,MOYTO/SELO,"
+	.ascii	"RABOTI,V/REKLAMNIYA/BIZNES/DOSTA,E,DOBOUR..!"
+	.ascii	"-MODEREN/LI/E?"
+	.ascii	"-MNOGO,POCHTI/KOLKOTO,RESORA/NA/GABRIEL."
+	.ascii	"-OKEY,SHTE/SE/CHUEM,PO-KOUSNO.."
+	.ascii	"-DOBRE,AJDE,CHAO"
+	.asciz	"-CHAO"	
 TOPSECRETMSG03:
 	.asciz	"0C1728352E0C301D3A"
 zecode:

@@ -1,19 +1,17 @@
-## *004*
+## *004*	
 **T**he [*mission*](https://ioinformatics.org/files/ioi1989problem4.pdf)
 is *top secret* ***(as usual)*** and is "bout figuring a message encoding.
-We have *34* symbols: the alphabet capital letters **```A-Z```** and
-*8* punctuation marks: **```. , + - : / ? !```**, and we have ***first***
-to find such encoding that each byte of information contains even number
+There are *34* symbols: the alphabet capital letters **```A-Z```** and
+*8* punctuation marks: **```. , + - : / ? !```**. Ve have to, **first**
+find such an encoding that each byte of information contains even number
 of bits, and *second* the message has to have minimum size.
-
-Obviously nobody is interested in an *8-bit* encoding, *7* is too
-odd number even to consider, and we need at least *6* bits to
+Obviously we are not interested in an *8-bit* encoding, *7* is too
+odd number even to consider, and one needs at least *6* bits to
 represent *34* different characters *(2<sup>5</sup> = 32)*, so the
-question is: Can we find some fancy *6-bit* encoding which spans
-through byte boundaries and preserves even parity? Actually it can
-be proven that it's impossible!
+question is: Is there some fancy *6-bit* encoding which spans
+through byte boundaries and preserves even parity?
 
-#### ..TRYING,DESPERATELY+TO,LOOK/COOL,24/7.,
+#### *..TRYING,DESPERATELY+TO,LOOK/COOL,24/7.,*
 Let's mark each *2-bit* field within a *6-bit* segment as follows:):
 ```
 +---+---+---+
@@ -33,7 +31,7 @@ In every byte the first and the last *2-bit* fields are the same, so
 center bits must have even parity, which is true for all *3* combinations,
 zo all *3* fields must have either even *(0, 3)* or odd *(1, 2)* parity,
 but there are only *16* such cases. So we can't encode characters in a
-*general* fashion. We  musta use some sort of convention..
+*general* fashion. We must use some sort of convention..
 
 ### ```C):' <- man with a hat smoking cigarette```
 ***Okay*** if someone plays against you *1. a2-a4*, I recommend
@@ -57,25 +55,25 @@ single *rchr*, in the *left field* ve put **dzero** and *even encoding* in the
 ```
 - two consecutive lchrs (e.g. ,.)
 8   6   4   2   0 
-+-+-+-+-+-+-+-+-+  6-8 field - 3 (Intel reserved)
++-+-+-+-+-+-+-+-+  6-8 field - (Intel reserved)
 |1|1|0|0|0|1|1|0|  4-6 field - dzero
 +-+-+-}-+-+-+-+-+  2-4 field - second lchr encoding
                    0-2 field - first lchr encoding
 
 - one single lchr (e.g. ,)
 8   6   4   2   0 
-+-+-+-+-+-+-+-+-+  6-8 field - 3 (Intel reserved)
++-+-+-+-+-+-+-+-+  6-8 field - (Intel reserved)
 |1|1|0|1|0|0|1|0|  4-6 field - U2
 +-+-+-+-+-+-<-+-+  2-4 field - dzero
                    0-2 field - lchr encoding
 ```
 It's obvious that there is r**00**m for other combinations like *3*
-repeating *lchrs* but it **```l..ks```** too much, so I didn't even
-consider such case, also *0xff* is used az an end of message byte.
+repeating *lchrs* but it **```l .. ks```** too much, so I didn't even
+consider such case, also *```0xff```* is used az an end of message byte.
 
 ### cipher.S
 *Yeah! Yea! Ye! Y! !* **Okay** the program is fairly simple, so I've
-decided this is the right time to show my assembly skillz:). It's a
+decided that, this is the right time to show my assembly skillz:). It's a
 *32-bit* ***gas*** using *glibs* and it will encode the message 
 given at the command line by default:
 ```
@@ -87,5 +85,7 @@ To decode use the *-d* option:
 $ ./cipher -d '0C212806303314AA2E143C0C221DB128353006282E1D3FC5'
 AKO/STE,PREYALI,SOUS/ORIZ..
 ```
-https://youtu.be/-ojHWQrm4UM
 
+https://youtu.be/cjVQ36NhbMk
+
+![fonts](pix/fonts.png)
